@@ -4,6 +4,8 @@ A single-page timezone visualizer. Four cities displayed as stacked sky-gradient
 
 **[Live demo →](https://philask.github.io/visual-time/)**
 
+![Visual Time screenshot](screenshot.png)
+
 ## Features
 
 - Sky gradient that reflects the actual time of day in each city — deep navy at midnight, golden sunrise, bright noon blue, fiery sunset, purple dusk
