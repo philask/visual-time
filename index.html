@@ -417,7 +417,7 @@
     // Write a cookie with a 1-year expiry.
     function setCookie(name, value) {
       const expires = new Date(Date.now() + 365 * 86_400_000).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires}`;
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/`;
     }
 
     // Load saved locations from cookie, falling back to DEFAULTS.
@@ -452,7 +452,14 @@
       let left = rect.left;
       if (left + 280 > window.innerWidth - 8) left = window.innerWidth - 288;
       editor.style.left = left + 'px';
-      editor.style.top  = (rect.bottom + 8) + 'px';
+
+      // Flip above if not enough room below (editor max-height ≈ 280px)
+      const editorH = 280;
+      const spaceBelow = window.innerHeight - rect.bottom - 8;
+      const top = spaceBelow >= editorH
+        ? rect.bottom + 8
+        : Math.max(8, rect.top - editorH - 8);
+      editor.style.top = top + 'px';
       editor.classList.remove('hidden');
 
       const input = document.getElementById('city-search');
@@ -697,7 +704,7 @@
       ].join('');
 
       return `
-        <div class="row" data-tz="${loc.tz}">
+        <div class="row" data-index="${index}" data-tz="${loc.tz}">
           <div class="label">
             <span class="city-name" onclick="openEditor(${index}, this)">${loc.name}</span>
             <span class="city-time">${timeStr}</span>
@@ -722,10 +729,10 @@
 
     // Cheaply update just the HH:MM text each second without touching the rulers.
     function updateClocks() {
-      for (const loc of LOCATIONS) {
-        const el = document.querySelector(`[data-tz="${loc.tz}"] .city-time`);
+      LOCATIONS.forEach((loc, i) => {
+        const el = document.querySelector(`.row[data-index="${i}"] .city-time`);
         if (el) el.textContent = getTimeInfo(loc.tz).timeStr;
-      }
+      });
     }
 
     // Schedule a full ruler rebuild at the next minute boundary, then recurse.
